@@ -8,10 +8,4 @@ import { Calculator } from './calculator';
 })
 export class AppComponent {
   title = 'ng-testing-services';
-
-  ngOnInit() {
-    const calculator = new Calculator();
-    const mult_answer = calculator.multiply(2, 78);
-    
-  }
 }
