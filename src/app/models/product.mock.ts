@@ -17,12 +17,6 @@ const generateOneProduct = (): Product => {
 
 const generateManyProducts = (size = 10): Product[] => {
   return Array.from({ length: size }, generateOneProduct);
-  // const products: Product[] = [];
-  // for (let i = 0; i < size; i++) {
-  //   products.push(generateOneProduct());
-  // }
-
-  // return [...products];
 }
 
 export { generateOneProduct, generateManyProducts };
