@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { ProductsService } from './products.service';
-import { CreateProductDTO, Product } from '../models/product.model';
+import { CreateProductDTO, Product, UpdateProductDTO } from '../models/product.model';
 import { environment } from '../../environments/environment';
 import { generateManyProducts, generateOneProduct } from '../models/product.mock';
 
@@ -186,6 +186,74 @@ fdescribe('ProductsService', () => {
       const url = `${environment.API_URL}/api/v1/products`;
       const req = httpController.expectOne(url);
       req.flush(mockProduct);
+      
+      expect(req.request.body).toEqual(dto);
+    });
+  });
+
+  describe('Tests for updated()', () => {
+    it('should update a user through a PUT request', (doneFn) => {
+      const mockProduct: Product = generateOneProduct();
+      const dto: UpdateProductDTO = {
+        title: 'Updated product title.'
+      };
+
+      productsService.update(mockProduct.id, {...dto}).subscribe(() => {
+        doneFn();
+      });
+
+      const url = `${environment.API_URL}/api/v1/products/${mockProduct.id}`;
+      const req = httpController.expectOne(url);
+      req.flush({
+        ...mockProduct,
+        title: 'Updated product title.'
+      });
+
+      expect(req.request.method).toBe('PUT');
+    });
+
+    it('should return an updated product', (doneFn) => {
+      const mockProduct: Product = generateOneProduct();
+      const dto: UpdateProductDTO = {
+        title: 'Updated product title.'
+      };
+
+      productsService.update(mockProduct.id, {...dto}).subscribe((product) => {
+        expect(product).toEqual({
+          ...mockProduct,
+          title: 'Updated product title.'
+        });
+        doneFn();
+      });
+
+      const url = `${environment.API_URL}/api/v1/products/${mockProduct.id}`;
+      const req = httpController.expectOne(url);
+      req.flush({
+        ...mockProduct,
+        title: 'Updated product title.'
+      });
+    });
+
+    it('should send the dto passed as argument without any changes', (doneFn) => {
+      const mockProduct: Product = generateOneProduct();
+      const dto: UpdateProductDTO = {
+        title: 'Updated product title.'
+      };
+
+      productsService.update(mockProduct.id, {...dto}).subscribe((product) => {
+        expect(product).toEqual({
+          ...mockProduct,
+          title: 'Updated product title.'
+        });
+        doneFn();
+      });
+
+      const url = `${environment.API_URL}/api/v1/products/${mockProduct.id}`;
+      const req = httpController.expectOne(url);
+      req.flush({
+        ...mockProduct,
+        title: 'Updated product title.'
+      });
       
       expect(req.request.body).toEqual(dto);
     });
