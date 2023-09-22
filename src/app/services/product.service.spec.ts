@@ -258,4 +258,34 @@ fdescribe('ProductsService', () => {
       expect(req.request.body).toEqual(dto);
     });
   });
+
+  describe('Tests for delete()', () => {
+    it('should delete a product through a DELETE request', (doneFn) => {
+      const mockProduct: Product = generateOneProduct();
+
+      productsService.delete(mockProduct.id).subscribe(() => {
+        doneFn();
+      });
+
+      const url = `${environment.API_URL}/api/v1/products/${mockProduct.id}`;
+      const req = httpController.expectOne(url);
+      req.flush(true);
+
+      expect(req.request.method).toBe('DELETE');
+    });
+
+    it('should delete a product', (doneFn) => {
+      const mockResponse = true;
+      const mockId = '123-asd-41-sa-2';
+
+      productsService.delete(mockId).subscribe((result) => {
+        expect(result).toBe(mockResponse);
+        doneFn();
+      });
+
+      const url = `${environment.API_URL}/api/v1/products/${mockId}`;
+      const req = httpController.expectOne(url);
+      req.flush(mockResponse);
+    });
+  });
 });
