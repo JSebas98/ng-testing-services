@@ -5,17 +5,29 @@ import { ProductsService } from './products.service';
 import { CreateProductDTO, Product, UpdateProductDTO } from '../models/product.model';
 import { environment } from '../../environments/environment';
 import { generateManyProducts, generateOneProduct } from '../models/product.mock';
-import { HttpStatusCode } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpStatusCode } from '@angular/common/http';
+import { TokenInterceptor } from '../interceptors/token.interceptor';
+import { TokenService } from './token.service';
 
-fdescribe('ProductsService', () => {
+describe('ProductsService', () => {
   let productsService: ProductsService;
+  let tokenService: TokenService;
   let httpController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [ HttpClientTestingModule ],
+      providers: [
+        TokenService,
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: TokenInterceptor,
+          multi: true
+        }
+      ]
     });
     productsService = TestBed.inject(ProductsService);
+    tokenService = TestBed.inject(TokenService);
     httpController = TestBed.inject(HttpTestingController);
   });
 
@@ -28,6 +40,20 @@ fdescribe('ProductsService', () => {
   });
 
   describe('Tests for getAllSimple()', () => {
+    it('should be intercepted by TokenInterceptor', (doneFn) => {
+      spyOn(tokenService, 'getToken').and.returnValue('tkn-123');
+
+      productsService.getAllSimple().subscribe(() => {
+        doneFn();
+      });
+
+      const url = `${environment.API_URL}/api/v1/products`;
+      const req = httpController.expectOne(url);
+      req.flush([]);
+      const headers = req.request.headers;
+      expect(headers.get('Authorization')).toEqual('Bearer tkn-123');
+    });
+
     it('should return a product list', (doneFn) => {
       const mockProductList: Product[] = generateManyProducts(2);
 
@@ -290,7 +316,7 @@ fdescribe('ProductsService', () => {
     });
   });
 
-  fdescribe('Tests for getOne()', () => {
+  describe('Tests for getOne()', () => {
     it('should get one product', (doneFn) => {
       const mockProduct = generateOneProduct();
       const mockId = mockProduct.id;
