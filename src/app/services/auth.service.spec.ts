@@ -6,7 +6,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { Auth } from '../models/auth.model';
 import { environment } from 'src/environments/environment';
 
-fdescribe('AuthService', () => {
+describe('AuthService', () => {
   let authService: AuthService;
   let tokenService: TokenService;
   let httpController: HttpTestingController;
